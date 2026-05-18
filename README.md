@@ -27,6 +27,8 @@ We propose VerifyMAS, a hypothesis verification framework for agent failure attr
 
 <div align="center"><img src="main_table.png" width="98%"></div>
 
+<div align="center"><img src="sft_table.png" width="98%"></div>
+
 
 ## Repository Structure
 
