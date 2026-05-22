@@ -30,9 +30,13 @@ We propose **VerifyMAS**, a **hypothesis verification framework** for agent fail
 The code will be uploaded soon. 
 
 
-## Citation
 
-If you find this work useful, please cite:
+
+## 📖 Citation
+    
+If you find this work useful, please cite our paper:
+
+```bibtex
 @article{qiao2026verifymas,
   title={VerifyMAS: Hypothesis Verification for Failure Attribution in LLM Multi-Agent Systems},
   author={Qiao, Hezhe and Tong, Hanghang and Lim, Ee-Peng and Liu, Bing and Pang, Guansong},
@@ -40,9 +44,3 @@ If you find this work useful, please cite:
   year={2026}
 }
 
-```
-
-## License
-
-- **Code** (`inference/`): MIT License — see [LICENSE](LICENSE).
-- **Dataset** (HuggingFace `ZBox008003/AFTraj`): CC BY 4.0.
