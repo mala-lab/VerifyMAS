@@ -33,7 +33,12 @@ The code will be uploaded soon.
 ## Citation
 
 If you find this work useful, please cite:
-
+@article{qiao2026verifymas,
+  title={VerifyMAS: Hypothesis Verification for Failure Attribution in LLM Multi-Agent Systems},
+  author={Qiao, Hezhe and Tong, Hanghang and Lim, Ee-Peng and Liu, Bing and Pang, Guansong},
+  journal={arXiv preprint arXiv:2605.17467},
+  year={2026}
+}
 
 ```
 
