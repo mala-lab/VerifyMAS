@@ -2,7 +2,7 @@
 
 <img src="logo_full.png" width="560">
 
-## OVerifyMAS: Hypothesis Verification for Failure Attribution in LLM Multi-Agent Systems
+## VerifyMAS: Hypothesis Verification for Failure Attribution in LLM Multi-Agent Systems
 
 [![arXiv](https://img.shields.io/badge/arXiv-2605.08715-b31b1b)](https://arxiv.org/abs/2605.17467)
 [![Project Page](https://img.shields.io/badge/Project_Page-website-blue)](https://hezheqiao2022.github.io/VerifyMAS/)
