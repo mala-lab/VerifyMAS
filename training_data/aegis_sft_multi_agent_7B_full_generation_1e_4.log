@@ -1,0 +1,1251 @@
++ '[' 2 -lt 2 ']'
++ nproc_per_node=2
++ save_path=./detector_nil_sft_multi_agent_7B_full_generation_1e_4
++ TRAIN_DATA=./data/maserror/data/train_aegis_sft_no_agent_multi_agent_jsonl_balanced.parquet
++ VAL_DATA=./data/maserror/data/validation_aegis_sft_no_agent_multi_agent_jsonl_balanced.parquet
++ mkdir -p ./detector_nil_sft_multi_agent_7B_full_generation_1e_4
++ torchrun --standalone --nnodes=1 --nproc_per_node=2 -m verl.trainer.fsdp_direct_full_json_generation_sft_trainer data.train_files=./data/maserror/data/train_aegis_sft_no_agent_multi_agent_jsonl_balanced.parquet data.val_files=./data/maserror/data/validation_aegis_sft_no_agent_multi_agent_jsonl_balanced.parquet data.prompt_key=prompt data.response_key=response optim.lr=1e-4 data.micro_batch_size_per_gpu=2 data.train_batch_size=64 data.max_length=8192 data.truncation=right model.partial_pretrain=Qwen/Qwen2.5-7B-Instruct model.trust_remote_code=True model.lora_rank=64 model.lora_alpha=16 model.target_modules=all-linear model.fsdp_config.cpu_offload=False model.fsdp_config.offload_params=False model.fsdp_config.model_dtype=bf16 model.enable_gradient_checkpointing=True model.strategy=fsdp trainer.default_local_dir=./detector_nil_sft_multi_agent_7B_full_generation_1e_4 trainer.project_name=mas_error_attribution trainer.experiment_name=qwen25-14b-instruct-sft 'trainer.logger=[console]' trainer.total_epochs=5 trainer.save_freq=50 trainer.test_freq=-1 trainer.default_hdfs_dir=null trainer.n_gpus_per_node=2
+W0430 14:23:32.000000 3521375 site-packages/torch/distributed/run.py:852] 
+W0430 14:23:32.000000 3521375 site-packages/torch/distributed/run.py:852] *****************************************
+W0430 14:23:32.000000 3521375 site-packages/torch/distributed/run.py:852] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0430 14:23:32.000000 3521375 site-packages/torch/distributed/run.py:852] *****************************************
+/home/qiaohezhe/code/AEGIS-main/verl/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/home/qiaohezhe/code/AEGIS-main/verl/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+[DATA] loaded 32387 valid rows, dropped 0 invalid rows
+[DATA] label counts: A=16659, B=5767, C=9961, A_multi_agent=1038
+[DATA] loaded 8337 valid rows, dropped 0 invalid rows
+[DATA] label counts: A=4260, B=1470, C=2607, A_multi_agent=281
+[DATA] loaded 32387 valid rows, dropped 0 invalid rows
+[DATA] label counts: A=16659, B=5767, C=9961, A_multi_agent=1038
+[DATA] loaded 8337 valid rows, dropped 0 invalid rows
+[DATA] label counts: A=4260, B=1470, C=2607, A_multi_agent=281
+===== DEBUG DATASET =====
+train size: 32387
+--- sample 0 ---
+label: A
+gold_response_text: {"label":"A","agents":["RoleAssigner"]}
+gold_agent_names: ['RoleAssigner']
+input len: 4647
+prompt length: 4635
+decoded prompt tail:  success, it would not be necessary to review the requirements further since the validation rules have already been implemented impeccably. 
+
+For the next round of experts, considering a date and time validation specialist may not significantly improve the function, as it is already flawless. Importantly, legal experts in writing unit tests may be required to validate that the function is thoroughly tested against various scenarios, although the minimal issues present might not warrant additional tests at this time.
+
+Hypothesis:
+An agent omitted important information needed by other agents in the trajectory.
+
+Candidate agents:
+- RoleAssigner
+- Solver
+- Evaluator
+decoded target: {"label":"A","agents":["RoleAssigner"]}<|im_end|>
+candidate_agents: ['RoleAssigner']
+--- sample 1 ---
+label: C
+gold_response_text: {"label":"C","agents":[]}
+gold_agent_names: []
+input len: 4643
+prompt length: 4634
+decoded prompt tail:  continued success, it would not be necessary to review the requirements further since the validation rules have already been implemented impeccably. 
+
+For the next round of experts, considering a date and time validation specialist may not significantly improve the function, as it is already flawless. Importantly, legal experts in writing unit tests may be required to validate that the function is thoroughly tested against various scenarios, although the minimal issues present might not warrant additional tests at this time.
+
+Hypothesis:
+An agent skipped necessary verification or validation steps in the trajectory.
+
+Candidate agents:
+- RoleAssigner
+- Solver
+- Evaluator
+decoded target: {"label":"C","agents":[]}<|im_end|>
+candidate_agents: []
+--- sample 2 ---
+label: B
+gold_response_text: {"label":"B","agents":[]}
+gold_agent_names: []
+input len: 4646
+prompt length: 4637
+decoded prompt tail:  it would not be necessary to review the requirements further since the validation rules have already been implemented impeccably. 
+
+For the next round of experts, considering a date and time validation specialist may not significantly improve the function, as it is already flawless. Importantly, legal experts in writing unit tests may be required to validate that the function is thoroughly tested against various scenarios, although the minimal issues present might not warrant additional tests at this time.
+
+Hypothesis:
+An agent made a request unclear or ambiguous for other agents in the trajectory.
+
+Candidate agents:
+- RoleAssigner
+- Solver
+- Evaluator
+decoded target: {"label":"B","agents":[]}<|im_end|>
+candidate_agents: []
+===== END DEBUG =====
+Normalize batch size by dp 2
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:00<00:00, 154.28it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:00<00:00, 119.12it/s]
+NCCL version 2.27.5+cuda12.9
+{'data': {'train_batch_size': 32, 'micro_batch_size': None, 'micro_batch_size_per_gpu': 2, 'train_files': './data/maserror/data/train_aegis_sft_no_agent_multi_agent_jsonl_balanced.parquet', 'val_files': './data/maserror/data/validation_aegis_sft_no_agent_multi_agent_jsonl_balanced.parquet', 'prompt_key': 'prompt', 'response_key': 'response', 'prompt_dict_keys': None, 'response_dict_keys': None, 'multiturn': {'enable': False, 'messages_key': 'messages', 'tools_key': 'tools', 'enable_thinking_key': 'enable_thinking'}, 'max_length': 8192, 'truncation': 'right', 'balance_dp_token': False, 'chat_template': None, 'custom_cls': {'path': None, 'name': None}, 'use_shm': False}, 'model': {'partial_pretrain': 'Qwen/Qwen2.5-7B-Instruct', 'use_shm': False, 'fsdp_config': {'model_dtype': 'bf16', 'wrap_policy': {'min_num_params': 0}, 'cpu_offload': False, 'offload_params': False}, 'external_lib': None, 'enable_gradient_checkpointing': True, 'trust_remote_code': True, 'lora_rank': 64, 'lora_alpha': 16, 'target_modules': 'all-linear', 'use_liger': False, 'strategy': 'fsdp'}, 'optim': {'lr': 0.0001, 'betas': [0.9, 0.95], 'weight_decay': 0.01, 'warmup_steps_ratio': 0.1, 'clip_grad': 1.0, 'lr_scheduler': 'cosine'}, 'ulysses_sequence_parallel_size': 1, 'use_remove_padding': False, 'trainer': {'default_local_dir': './detector_nil_sft_multi_agent_7B_full_generation_1e_4', 'default_hdfs_dir': None, 'resume_path': None, 'project_name': 'mas_error_attribution', 'experiment_name': 'qwen25-14b-instruct-sft', 'total_epochs': 5, 'total_training_steps': None, 'logger': ['console'], 'seed': 1, 'save_freq': 50, 'test_freq': -1, 'nnodes': 1, 'n_gpus_per_node': 2, 'max_ckpt_to_keep': None}}
+[INFO] Direct generation SFT: LM loss only; no cls_head.
+Using LocalLogger is deprecated. The constructor API will change 
+Total training steps: 2530
+Total training steps: 2530
+step:1 - train/loss:3.971 - train/lm_loss:3.971 - train/ppl:53.028 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.000
+step:2 - train/loss:3.837 - train/lm_loss:3.837 - train/ppl:46.401 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.001
+step:3 - train/loss:3.828 - train/lm_loss:3.828 - train/ppl:45.968 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.001
+step:4 - train/loss:3.837 - train/lm_loss:3.837 - train/ppl:46.403 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.002
+step:5 - train/loss:4.078 - train/lm_loss:4.078 - train/ppl:59.053 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.002
+step:6 - train/loss:3.688 - train/lm_loss:3.688 - train/ppl:39.962 - train/num_active_tokens:700.000 - train/num_samples:64.000 - train/lr(1e-3):0.002
+step:7 - train/loss:3.648 - train/lm_loss:3.648 - train/ppl:38.402 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.003
+step:8 - train/loss:3.848 - train/lm_loss:3.848 - train/ppl:46.891 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.003
+step:9 - train/loss:4.026 - train/lm_loss:4.026 - train/ppl:56.028 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.004
+step:10 - train/loss:3.847 - train/lm_loss:3.847 - train/ppl:46.874 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.004
+step:11 - train/loss:3.955 - train/lm_loss:3.955 - train/ppl:52.205 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.004
+step:12 - train/loss:4.091 - train/lm_loss:4.091 - train/ppl:59.773 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.005
+step:13 - train/loss:3.849 - train/lm_loss:3.849 - train/ppl:46.943 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.005
+step:14 - train/loss:3.909 - train/lm_loss:3.909 - train/ppl:49.833 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.006
+step:15 - train/loss:3.821 - train/lm_loss:3.821 - train/ppl:45.652 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.006
+step:16 - train/loss:3.929 - train/lm_loss:3.929 - train/ppl:50.838 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.006
+step:17 - train/loss:3.689 - train/lm_loss:3.689 - train/ppl:40.012 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.007
+step:18 - train/loss:3.850 - train/lm_loss:3.850 - train/ppl:46.976 - train/num_active_tokens:694.000 - train/num_samples:64.000 - train/lr(1e-3):0.007
+step:19 - train/loss:4.005 - train/lm_loss:4.005 - train/ppl:54.876 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.008
+step:20 - train/loss:3.581 - train/lm_loss:3.581 - train/ppl:35.895 - train/num_active_tokens:635.000 - train/num_samples:64.000 - train/lr(1e-3):0.008
+step:21 - train/loss:3.677 - train/lm_loss:3.677 - train/ppl:39.516 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.008
+step:22 - train/loss:3.769 - train/lm_loss:3.769 - train/ppl:43.354 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.009
+step:23 - train/loss:3.723 - train/lm_loss:3.723 - train/ppl:41.371 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.009
+step:24 - train/loss:3.558 - train/lm_loss:3.558 - train/ppl:35.107 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.009
+step:25 - train/loss:3.999 - train/lm_loss:3.999 - train/ppl:54.544 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.010
+step:26 - train/loss:3.691 - train/lm_loss:3.691 - train/ppl:40.084 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.010
+step:27 - train/loss:3.994 - train/lm_loss:3.994 - train/ppl:54.294 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.011
+step:28 - train/loss:3.547 - train/lm_loss:3.547 - train/ppl:34.711 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.011
+step:29 - train/loss:3.479 - train/lm_loss:3.479 - train/ppl:32.425 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.011
+step:30 - train/loss:3.371 - train/lm_loss:3.371 - train/ppl:29.101 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.012
+step:31 - train/loss:3.358 - train/lm_loss:3.358 - train/ppl:28.743 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.012
+step:32 - train/loss:3.269 - train/lm_loss:3.269 - train/ppl:26.274 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.013
+step:33 - train/loss:3.504 - train/lm_loss:3.504 - train/ppl:33.264 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.013
+step:34 - train/loss:3.416 - train/lm_loss:3.416 - train/ppl:30.459 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.013
+step:35 - train/loss:2.988 - train/lm_loss:2.988 - train/ppl:19.836 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.014
+step:36 - train/loss:2.943 - train/lm_loss:2.943 - train/ppl:18.973 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.014
+step:37 - train/loss:2.904 - train/lm_loss:2.904 - train/ppl:18.253 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.015
+step:38 - train/loss:2.827 - train/lm_loss:2.827 - train/ppl:16.892 - train/num_active_tokens:714.000 - train/num_samples:64.000 - train/lr(1e-3):0.015
+step:39 - train/loss:2.858 - train/lm_loss:2.858 - train/ppl:17.430 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.015
+step:40 - train/loss:2.747 - train/lm_loss:2.747 - train/ppl:15.590 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.016
+step:41 - train/loss:2.485 - train/lm_loss:2.485 - train/ppl:12.005 - train/num_active_tokens:713.000 - train/num_samples:64.000 - train/lr(1e-3):0.016
+step:42 - train/loss:2.679 - train/lm_loss:2.679 - train/ppl:14.573 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.017
+step:43 - train/loss:2.370 - train/lm_loss:2.370 - train/ppl:10.701 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.017
+step:44 - train/loss:2.474 - train/lm_loss:2.474 - train/ppl:11.869 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.017
+step:45 - train/loss:2.061 - train/lm_loss:2.061 - train/ppl:7.851 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.018
+step:46 - train/loss:1.741 - train/lm_loss:1.741 - train/ppl:5.705 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.018
+step:47 - train/loss:1.956 - train/lm_loss:1.956 - train/ppl:7.072 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.019
+step:48 - train/loss:1.814 - train/lm_loss:1.814 - train/ppl:6.134 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.019
+step:49 - train/loss:1.559 - train/lm_loss:1.559 - train/ppl:4.755 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.019
+step:50 - train/loss:1.492 - train/lm_loss:1.492 - train/ppl:4.444 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.020
+/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:822: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+  prev_state_dict_settings = FullyShardedDataParallel.set_state_dict_type(
+/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:822: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+  prev_state_dict_settings = FullyShardedDataParallel.set_state_dict_type(
+/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:829: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+  FullyShardedDataParallel.set_state_dict_type(
+/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:829: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+  FullyShardedDataParallel.set_state_dict_type(
+/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+step:51 - train/loss:1.648 - train/lm_loss:1.648 - train/ppl:5.199 - train/num_active_tokens:720.000 - train/num_samples:64.000 - train/lr(1e-3):0.020
+step:52 - train/loss:1.575 - train/lm_loss:1.575 - train/ppl:4.830 - train/num_active_tokens:718.000 - train/num_samples:64.000 - train/lr(1e-3):0.021
+step:53 - train/loss:1.318 - train/lm_loss:1.318 - train/ppl:3.736 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.021
+step:54 - train/loss:1.499 - train/lm_loss:1.499 - train/ppl:4.475 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.021
+step:55 - train/loss:1.164 - train/lm_loss:1.164 - train/ppl:3.202 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.022
+step:56 - train/loss:1.136 - train/lm_loss:1.136 - train/ppl:3.115 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.022
+step:57 - train/loss:1.042 - train/lm_loss:1.042 - train/ppl:2.836 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.023
+step:58 - train/loss:0.981 - train/lm_loss:0.981 - train/ppl:2.668 - train/num_active_tokens:701.000 - train/num_samples:64.000 - train/lr(1e-3):0.023
+step:59 - train/loss:1.145 - train/lm_loss:1.145 - train/ppl:3.143 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.023
+step:60 - train/loss:1.252 - train/lm_loss:1.252 - train/ppl:3.498 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.024
+step:61 - train/loss:0.877 - train/lm_loss:0.877 - train/ppl:2.403 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.024
+step:62 - train/loss:0.833 - train/lm_loss:0.833 - train/ppl:2.301 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.025
+step:63 - train/loss:0.669 - train/lm_loss:0.669 - train/ppl:1.952 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.025
+step:64 - train/loss:0.919 - train/lm_loss:0.919 - train/ppl:2.506 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.025
+step:65 - train/loss:0.619 - train/lm_loss:0.619 - train/ppl:1.857 - train/num_active_tokens:713.000 - train/num_samples:64.000 - train/lr(1e-3):0.026
+step:66 - train/loss:0.677 - train/lm_loss:0.677 - train/ppl:1.967 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.026
+step:67 - train/loss:0.658 - train/lm_loss:0.658 - train/ppl:1.930 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.026
+step:68 - train/loss:0.799 - train/lm_loss:0.799 - train/ppl:2.223 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.027
+step:69 - train/loss:0.598 - train/lm_loss:0.598 - train/ppl:1.818 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.027
+step:70 - train/loss:0.579 - train/lm_loss:0.579 - train/ppl:1.784 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.028
+step:71 - train/loss:0.740 - train/lm_loss:0.740 - train/ppl:2.095 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.028
+step:72 - train/loss:0.651 - train/lm_loss:0.651 - train/ppl:1.917 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.028
+step:73 - train/loss:0.492 - train/lm_loss:0.492 - train/ppl:1.636 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.029
+step:74 - train/loss:0.570 - train/lm_loss:0.570 - train/ppl:1.768 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.029
+step:75 - train/loss:0.490 - train/lm_loss:0.490 - train/ppl:1.632 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.030
+step:76 - train/loss:0.510 - train/lm_loss:0.510 - train/ppl:1.664 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.030
+step:77 - train/loss:0.757 - train/lm_loss:0.757 - train/ppl:2.131 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.030
+step:78 - train/loss:0.474 - train/lm_loss:0.474 - train/ppl:1.606 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.031
+step:79 - train/loss:0.395 - train/lm_loss:0.395 - train/ppl:1.484 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.031
+step:80 - train/loss:0.447 - train/lm_loss:0.447 - train/ppl:1.563 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.032
+step:81 - train/loss:0.270 - train/lm_loss:0.270 - train/ppl:1.309 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.032
+step:82 - train/loss:0.350 - train/lm_loss:0.350 - train/ppl:1.419 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.032
+step:83 - train/loss:0.224 - train/lm_loss:0.224 - train/ppl:1.251 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.033
+step:84 - train/loss:0.365 - train/lm_loss:0.365 - train/ppl:1.440 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.033
+step:85 - train/loss:0.244 - train/lm_loss:0.244 - train/ppl:1.277 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.034
+step:86 - train/loss:0.221 - train/lm_loss:0.221 - train/ppl:1.247 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.034
+step:87 - train/loss:0.255 - train/lm_loss:0.255 - train/ppl:1.291 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.034
+step:88 - train/loss:0.240 - train/lm_loss:0.240 - train/ppl:1.272 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.035
+step:89 - train/loss:0.229 - train/lm_loss:0.229 - train/ppl:1.257 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.035
+step:90 - train/loss:0.223 - train/lm_loss:0.223 - train/ppl:1.250 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.036
+step:91 - train/loss:0.264 - train/lm_loss:0.264 - train/ppl:1.302 - train/num_active_tokens:714.000 - train/num_samples:64.000 - train/lr(1e-3):0.036
+step:92 - train/loss:0.223 - train/lm_loss:0.223 - train/ppl:1.250 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.036
+step:93 - train/loss:0.182 - train/lm_loss:0.182 - train/ppl:1.200 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.037
+step:94 - train/loss:0.216 - train/lm_loss:0.216 - train/ppl:1.242 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.037
+step:95 - train/loss:0.253 - train/lm_loss:0.253 - train/ppl:1.289 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.038
+step:96 - train/loss:0.181 - train/lm_loss:0.181 - train/ppl:1.199 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.038
+step:97 - train/loss:0.189 - train/lm_loss:0.189 - train/ppl:1.208 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.038
+step:98 - train/loss:0.207 - train/lm_loss:0.207 - train/ppl:1.230 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.039
+step:99 - train/loss:0.235 - train/lm_loss:0.235 - train/ppl:1.265 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.039
+step:100 - train/loss:0.266 - train/lm_loss:0.266 - train/ppl:1.304 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.040
+step:101 - train/loss:0.172 - train/lm_loss:0.172 - train/ppl:1.188 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.040
+step:102 - train/loss:0.188 - train/lm_loss:0.188 - train/ppl:1.207 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.040
+step:103 - train/loss:0.176 - train/lm_loss:0.176 - train/ppl:1.193 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.041
+step:104 - train/loss:0.192 - train/lm_loss:0.192 - train/ppl:1.211 - train/num_active_tokens:697.000 - train/num_samples:64.000 - train/lr(1e-3):0.041
+step:105 - train/loss:0.187 - train/lm_loss:0.187 - train/ppl:1.206 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.042
+step:106 - train/loss:0.166 - train/lm_loss:0.166 - train/ppl:1.180 - train/num_active_tokens:633.000 - train/num_samples:64.000 - train/lr(1e-3):0.042
+step:107 - train/loss:0.194 - train/lm_loss:0.194 - train/ppl:1.214 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.042
+step:108 - train/loss:0.190 - train/lm_loss:0.190 - train/ppl:1.209 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.043
+step:109 - train/loss:0.173 - train/lm_loss:0.173 - train/ppl:1.189 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.043
+step:110 - train/loss:0.161 - train/lm_loss:0.161 - train/ppl:1.175 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.043
+step:111 - train/loss:0.209 - train/lm_loss:0.209 - train/ppl:1.233 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.044
+step:112 - train/loss:0.167 - train/lm_loss:0.167 - train/ppl:1.181 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.044
+step:113 - train/loss:0.238 - train/lm_loss:0.238 - train/ppl:1.268 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.045
+step:114 - train/loss:0.168 - train/lm_loss:0.168 - train/ppl:1.183 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.045
+step:115 - train/loss:0.164 - train/lm_loss:0.164 - train/ppl:1.178 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.045
+step:116 - train/loss:0.153 - train/lm_loss:0.153 - train/ppl:1.166 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.046
+step:117 - train/loss:0.198 - train/lm_loss:0.198 - train/ppl:1.219 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.046
+step:118 - train/loss:0.172 - train/lm_loss:0.172 - train/ppl:1.188 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.047
+step:119 - train/loss:0.191 - train/lm_loss:0.191 - train/ppl:1.210 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.047
+step:120 - train/loss:0.169 - train/lm_loss:0.169 - train/ppl:1.184 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.047
+step:121 - train/loss:0.195 - train/lm_loss:0.195 - train/ppl:1.215 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.048
+step:122 - train/loss:0.157 - train/lm_loss:0.157 - train/ppl:1.170 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.048
+step:123 - train/loss:0.222 - train/lm_loss:0.222 - train/ppl:1.248 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.049
+step:124 - train/loss:0.181 - train/lm_loss:0.181 - train/ppl:1.199 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.049
+step:125 - train/loss:0.161 - train/lm_loss:0.161 - train/ppl:1.174 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.049
+step:126 - train/loss:0.152 - train/lm_loss:0.152 - train/ppl:1.165 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.050
+step:127 - train/loss:0.166 - train/lm_loss:0.166 - train/ppl:1.180 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.050
+step:128 - train/loss:0.214 - train/lm_loss:0.214 - train/ppl:1.239 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.051
+step:129 - train/loss:0.190 - train/lm_loss:0.190 - train/ppl:1.209 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.051
+step:130 - train/loss:0.158 - train/lm_loss:0.158 - train/ppl:1.171 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.051
+step:131 - train/loss:0.168 - train/lm_loss:0.168 - train/ppl:1.183 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.052
+step:132 - train/loss:0.165 - train/lm_loss:0.165 - train/ppl:1.179 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.052
+step:133 - train/loss:0.162 - train/lm_loss:0.162 - train/ppl:1.176 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.053
+step:134 - train/loss:0.182 - train/lm_loss:0.182 - train/ppl:1.200 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.053
+step:135 - train/loss:0.160 - train/lm_loss:0.160 - train/ppl:1.173 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.053
+step:136 - train/loss:0.198 - train/lm_loss:0.198 - train/ppl:1.219 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.054
+step:137 - train/loss:0.168 - train/lm_loss:0.168 - train/ppl:1.183 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.054
+step:138 - train/loss:0.158 - train/lm_loss:0.158 - train/ppl:1.171 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.055
+step:139 - train/loss:0.202 - train/lm_loss:0.202 - train/ppl:1.223 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.055
+step:140 - train/loss:0.160 - train/lm_loss:0.160 - train/ppl:1.173 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.055
+step:141 - train/loss:0.155 - train/lm_loss:0.155 - train/ppl:1.168 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.056
+step:142 - train/loss:0.182 - train/lm_loss:0.182 - train/ppl:1.200 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.056
+step:143 - train/loss:0.166 - train/lm_loss:0.166 - train/ppl:1.181 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.057
+step:144 - train/loss:0.170 - train/lm_loss:0.170 - train/ppl:1.185 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.057
+step:145 - train/loss:0.162 - train/lm_loss:0.162 - train/ppl:1.176 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.057
+step:146 - train/loss:0.180 - train/lm_loss:0.180 - train/ppl:1.198 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.058
+step:147 - train/loss:0.159 - train/lm_loss:0.159 - train/ppl:1.172 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.058
+step:148 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.157 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.058
+step:149 - train/loss:0.177 - train/lm_loss:0.177 - train/ppl:1.194 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.059
+step:150 - train/loss:0.160 - train/lm_loss:0.160 - train/ppl:1.174 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.059
+step:151 - train/loss:0.154 - train/lm_loss:0.154 - train/ppl:1.166 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.060
+step:152 - train/loss:0.148 - train/lm_loss:0.148 - train/ppl:1.160 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.060
+step:153 - train/loss:0.165 - train/lm_loss:0.165 - train/ppl:1.179 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.060
+step:154 - train/loss:0.195 - train/lm_loss:0.195 - train/ppl:1.215 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.061
+step:155 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.163 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.061
+step:156 - train/loss:0.170 - train/lm_loss:0.170 - train/ppl:1.185 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.062
+step:157 - train/loss:0.169 - train/lm_loss:0.169 - train/ppl:1.184 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.062
+step:158 - train/loss:0.171 - train/lm_loss:0.171 - train/ppl:1.186 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.062
+step:159 - train/loss:0.184 - train/lm_loss:0.184 - train/ppl:1.202 - train/num_active_tokens:715.000 - train/num_samples:64.000 - train/lr(1e-3):0.063
+step:160 - train/loss:0.160 - train/lm_loss:0.160 - train/ppl:1.173 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.063
+step:161 - train/loss:0.173 - train/lm_loss:0.173 - train/ppl:1.189 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.064
+step:162 - train/loss:0.162 - train/lm_loss:0.162 - train/ppl:1.175 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.064
+step:163 - train/loss:0.172 - train/lm_loss:0.172 - train/ppl:1.187 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.064
+step:164 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.065
+step:165 - train/loss:0.156 - train/lm_loss:0.156 - train/ppl:1.169 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.065
+step:166 - train/loss:0.169 - train/lm_loss:0.169 - train/ppl:1.185 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.066
+step:167 - train/loss:0.149 - train/lm_loss:0.149 - train/ppl:1.161 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.066
+step:168 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.066
+step:169 - train/loss:0.173 - train/lm_loss:0.173 - train/ppl:1.188 - train/num_active_tokens:711.000 - train/num_samples:64.000 - train/lr(1e-3):0.067
+step:170 - train/loss:0.159 - train/lm_loss:0.159 - train/ppl:1.173 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.067
+step:171 - train/loss:0.147 - train/lm_loss:0.147 - train/ppl:1.158 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.068
+step:172 - train/loss:0.158 - train/lm_loss:0.158 - train/ppl:1.171 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.068
+step:173 - train/loss:0.163 - train/lm_loss:0.163 - train/ppl:1.177 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.068
+step:174 - train/loss:0.147 - train/lm_loss:0.147 - train/ppl:1.158 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.069
+step:175 - train/loss:0.153 - train/lm_loss:0.153 - train/ppl:1.165 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.069
+step:176 - train/loss:0.141 - train/lm_loss:0.141 - train/ppl:1.152 - train/num_active_tokens:630.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:177 - train/loss:0.158 - train/lm_loss:0.158 - train/ppl:1.171 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:178 - train/loss:0.172 - train/lm_loss:0.172 - train/ppl:1.187 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:179 - train/loss:0.181 - train/lm_loss:0.181 - train/ppl:1.199 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:180 - train/loss:0.139 - train/lm_loss:0.139 - train/ppl:1.150 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:181 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.163 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:182 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.163 - train/num_active_tokens:631.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:183 - train/loss:0.152 - train/lm_loss:0.152 - train/ppl:1.164 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:184 - train/loss:0.176 - train/lm_loss:0.176 - train/ppl:1.193 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:185 - train/loss:0.153 - train/lm_loss:0.153 - train/ppl:1.165 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:186 - train/loss:0.172 - train/lm_loss:0.172 - train/ppl:1.188 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:187 - train/loss:0.158 - train/lm_loss:0.158 - train/ppl:1.172 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:188 - train/loss:0.153 - train/lm_loss:0.153 - train/ppl:1.165 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:189 - train/loss:0.150 - train/lm_loss:0.150 - train/ppl:1.162 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:190 - train/loss:0.155 - train/lm_loss:0.155 - train/ppl:1.167 - train/num_active_tokens:704.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:191 - train/loss:0.155 - train/lm_loss:0.155 - train/ppl:1.167 - train/num_active_tokens:689.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:192 - train/loss:0.157 - train/lm_loss:0.157 - train/ppl:1.170 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:193 - train/loss:0.142 - train/lm_loss:0.142 - train/ppl:1.152 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:194 - train/loss:0.147 - train/lm_loss:0.147 - train/ppl:1.159 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:195 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:196 - train/loss:0.168 - train/lm_loss:0.168 - train/ppl:1.183 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:197 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:198 - train/loss:0.156 - train/lm_loss:0.156 - train/ppl:1.169 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:199 - train/loss:0.149 - train/lm_loss:0.149 - train/ppl:1.161 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:200 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:201 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.158 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:202 - train/loss:0.141 - train/lm_loss:0.141 - train/ppl:1.152 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:203 - train/loss:0.169 - train/lm_loss:0.169 - train/ppl:1.184 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:204 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:627.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:205 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:206 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:207 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:208 - train/loss:0.152 - train/lm_loss:0.152 - train/ppl:1.164 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:209 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.163 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:210 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.143 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:211 - train/loss:0.153 - train/lm_loss:0.153 - train/ppl:1.165 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:212 - train/loss:0.148 - train/lm_loss:0.148 - train/ppl:1.160 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:213 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.156 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:214 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:215 - train/loss:0.142 - train/lm_loss:0.142 - train/ppl:1.153 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:216 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:217 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.155 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:218 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:219 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:220 - train/loss:0.148 - train/lm_loss:0.148 - train/ppl:1.160 - train/num_active_tokens:722.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:221 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:222 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:223 - train/loss:0.156 - train/lm_loss:0.156 - train/ppl:1.169 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:224 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:225 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:226 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.135 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:227 - train/loss:0.162 - train/lm_loss:0.162 - train/ppl:1.175 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:228 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.156 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:229 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:230 - train/loss:0.142 - train/lm_loss:0.142 - train/ppl:1.152 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:231 - train/loss:0.147 - train/lm_loss:0.147 - train/ppl:1.158 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:232 - train/loss:0.176 - train/lm_loss:0.176 - train/ppl:1.193 - train/num_active_tokens:711.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:233 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:234 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:235 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:236 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:237 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:706.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:238 - train/loss:0.156 - train/lm_loss:0.156 - train/ppl:1.169 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:239 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:240 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:241 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.144 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:242 - train/loss:0.158 - train/lm_loss:0.158 - train/ppl:1.171 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:243 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:244 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:245 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:246 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:247 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:248 - train/loss:0.164 - train/lm_loss:0.164 - train/ppl:1.178 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:249 - train/loss:0.152 - train/lm_loss:0.152 - train/ppl:1.164 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:250 - train/loss:0.141 - train/lm_loss:0.141 - train/ppl:1.151 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:251 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:252 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:253 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:254 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.143 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:255 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:256 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:257 - train/loss:0.143 - train/lm_loss:0.143 - train/ppl:1.154 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:258 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:630.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:259 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.155 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:260 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:261 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:262 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.156 - train/num_active_tokens:633.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:263 - train/loss:0.139 - train/lm_loss:0.139 - train/ppl:1.149 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:264 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.120 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:265 - train/loss:0.154 - train/lm_loss:0.154 - train/ppl:1.167 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:266 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.146 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:267 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:268 - train/loss:0.147 - train/lm_loss:0.147 - train/ppl:1.159 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:269 - train/loss:0.143 - train/lm_loss:0.143 - train/ppl:1.154 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:270 - train/loss:0.152 - train/lm_loss:0.152 - train/ppl:1.165 - train/num_active_tokens:706.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:271 - train/loss:0.150 - train/lm_loss:0.150 - train/ppl:1.162 - train/num_active_tokens:711.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:272 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:273 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:274 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:275 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:276 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:277 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.139 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:278 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:279 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:280 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.146 - train/num_active_tokens:685.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:281 - train/loss:0.149 - train/lm_loss:0.149 - train/ppl:1.160 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:282 - train/loss:0.148 - train/lm_loss:0.148 - train/ppl:1.160 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:283 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:284 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:285 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.142 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:286 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:287 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:288 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.151 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:289 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:290 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:291 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:292 - train/loss:0.147 - train/lm_loss:0.147 - train/ppl:1.159 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:293 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.155 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:294 - train/loss:0.137 - train/lm_loss:0.137 - train/ppl:1.147 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:295 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:296 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:297 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:298 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:299 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.146 - train/num_active_tokens:704.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:300 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:301 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.155 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:302 - train/loss:0.143 - train/lm_loss:0.143 - train/ppl:1.154 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:303 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:304 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.130 - train/num_active_tokens:630.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:305 - train/loss:0.137 - train/lm_loss:0.137 - train/ppl:1.147 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:306 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.164 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:307 - train/loss:0.142 - train/lm_loss:0.142 - train/ppl:1.152 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:308 - train/loss:0.157 - train/lm_loss:0.157 - train/ppl:1.170 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:309 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.163 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:310 - train/loss:0.137 - train/lm_loss:0.137 - train/ppl:1.146 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:311 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:312 - train/loss:0.151 - train/lm_loss:0.151 - train/ppl:1.163 - train/num_active_tokens:630.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:313 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:314 - train/loss:0.148 - train/lm_loss:0.148 - train/ppl:1.159 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:315 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.128 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:316 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:317 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:318 - train/loss:0.172 - train/lm_loss:0.172 - train/ppl:1.188 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:319 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.136 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:320 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.144 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:321 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:322 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.145 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:323 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:324 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:325 - train/loss:0.153 - train/lm_loss:0.153 - train/ppl:1.166 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:326 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:327 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.138 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:328 - train/loss:0.141 - train/lm_loss:0.141 - train/ppl:1.151 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:329 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:330 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:331 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:332 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.156 - train/num_active_tokens:704.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:333 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:334 - train/loss:0.141 - train/lm_loss:0.141 - train/ppl:1.152 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:335 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:336 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:337 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:338 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.138 - train/num_active_tokens:703.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:339 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:340 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:631.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:341 - train/loss:0.142 - train/lm_loss:0.142 - train/ppl:1.153 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:342 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:343 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:633.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:344 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.122 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:345 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:346 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:347 - train/loss:0.137 - train/lm_loss:0.137 - train/ppl:1.147 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:348 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.145 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:349 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:350 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:351 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.121 - train/num_active_tokens:628.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:352 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:353 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:354 - train/loss:0.148 - train/lm_loss:0.148 - train/ppl:1.159 - train/num_active_tokens:697.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:355 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.100
+step:356 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:357 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:358 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:359 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.142 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:360 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:361 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:362 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.145 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:363 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.116 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:364 - train/loss:0.156 - train/lm_loss:0.156 - train/ppl:1.169 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:365 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:366 - train/loss:0.149 - train/lm_loss:0.149 - train/ppl:1.161 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:367 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:368 - train/loss:0.142 - train/lm_loss:0.142 - train/ppl:1.152 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:369 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:632.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:370 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:371 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:372 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:373 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:374 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.135 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:375 - train/loss:0.139 - train/lm_loss:0.139 - train/ppl:1.149 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:376 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:377 - train/loss:0.143 - train/lm_loss:0.143 - train/ppl:1.154 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:378 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.144 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:379 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.143 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:380 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:381 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.135 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:382 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:383 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:384 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:385 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:386 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:387 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:388 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:389 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.128 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:390 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.098 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:391 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.139 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:392 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:393 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:394 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:395 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:396 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:397 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:398 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:399 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:400 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:401 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:402 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:403 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.145 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:404 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.156 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:405 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.142 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:406 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.154 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:407 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.128 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:408 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:409 - train/loss:0.139 - train/lm_loss:0.139 - train/ppl:1.149 - train/num_active_tokens:705.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:410 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:411 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.136 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:412 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:413 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.128 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:414 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:415 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:416 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:417 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:700.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:418 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:705.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:419 - train/loss:0.145 - train/lm_loss:0.145 - train/ppl:1.155 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:420 - train/loss:0.149 - train/lm_loss:0.149 - train/ppl:1.161 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:421 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:422 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:423 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.136 - train/num_active_tokens:718.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:424 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.134 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:425 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:426 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:427 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:428 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:429 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:430 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.099
+step:431 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:432 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.100 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:433 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:434 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:435 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.139 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:436 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:437 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:438 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:439 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:615.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:440 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.143 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:441 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:627.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:442 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:443 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:444 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:445 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:446 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:447 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:448 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:449 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:703.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:450 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:451 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:452 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.136 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:453 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:454 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:455 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:712.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:456 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:457 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.134 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:458 - train/loss:0.139 - train/lm_loss:0.139 - train/ppl:1.149 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:459 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:460 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:461 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:462 - train/loss:0.137 - train/lm_loss:0.137 - train/ppl:1.147 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:463 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:464 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.126 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:465 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:466 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:467 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:468 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:635.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:469 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:470 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.146 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:471 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.135 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:472 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:473 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:624.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:474 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:475 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:476 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:477 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:478 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:479 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:480 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:481 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.151 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:482 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:483 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.098
+step:484 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:485 - train/loss:0.143 - train/lm_loss:0.143 - train/ppl:1.154 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:486 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:487 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.135 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:488 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:489 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:490 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:491 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.099 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:492 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:493 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:494 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:495 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:624.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:496 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.126 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:497 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.134 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:498 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:499 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:500 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:689.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:501 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.134 - train/num_active_tokens:709.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:502 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:503 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:504 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:505 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.139 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:506 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:507 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:508 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:509 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:510 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.101 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:511 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.136 - train/num_active_tokens:722.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:512 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.135 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:513 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:514 - train/loss:0.149 - train/lm_loss:0.149 - train/ppl:1.160 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:515 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.145 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:516 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.126 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:517 - train/loss:0.087 - train/lm_loss:0.087 - train/ppl:1.091 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:518 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.125 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:519 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:520 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:714.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:521 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:703.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:522 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:523 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.122 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:524 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:525 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.144 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.097
+step:526 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.143 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:527 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:528 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:529 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:530 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:531 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:532 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:533 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:534 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.144 - train/num_active_tokens:694.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:535 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.135 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:536 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:537 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:538 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:539 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:540 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:541 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:542 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.144 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:543 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:544 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:545 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:546 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:547 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:548 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.107 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:549 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:550 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.096 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:551 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.109 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:552 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:553 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:554 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:555 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:556 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:557 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:558 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:559 - train/loss:0.136 - train/lm_loss:0.136 - train/ppl:1.145 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:560 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:561 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:562 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.096
+step:563 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:564 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:565 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:566 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:567 - train/loss:0.089 - train/lm_loss:0.089 - train/ppl:1.093 - train/num_active_tokens:694.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:568 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:569 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:570 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:571 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:723.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:572 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:573 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:574 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:575 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:716.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:576 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:685.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:577 - train/loss:0.146 - train/lm_loss:0.146 - train/ppl:1.157 - train/num_active_tokens:714.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:578 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:579 - train/loss:0.135 - train/lm_loss:0.135 - train/ppl:1.144 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:580 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:581 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:582 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.127 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:583 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:584 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:701.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:585 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.121 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:586 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:587 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:588 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:589 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:590 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:591 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:592 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:593 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:594 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.106 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:595 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:596 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.095
+step:597 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.130 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:598 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.116 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:599 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:600 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:601 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:602 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.150 - train/num_active_tokens:713.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:603 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:604 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:605 - train/loss:0.127 - train/lm_loss:0.127 - train/ppl:1.135 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:606 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:607 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:608 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:609 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:610 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:611 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:612 - train/loss:0.138 - train/lm_loss:0.138 - train/ppl:1.148 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:613 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:614 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:615 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.139 - train/num_active_tokens:697.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:616 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:617 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:635.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:618 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:619 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:620 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:621 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.100 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:622 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:623 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:624 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:625 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:626 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.094
+step:627 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.126 - train/num_active_tokens:694.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:628 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:629 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.105 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:630 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:631 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.099 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:632 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:633 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:634 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:635 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:636 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:637 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:638 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:639 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:640 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.111 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:641 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:642 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:710.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:643 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.097 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:644 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.137 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:645 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:646 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:647 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.125 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:648 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:649 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:650 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.109 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:651 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:652 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:653 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:654 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:655 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.093
+step:656 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.155 - train/num_active_tokens:704.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:657 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:658 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:659 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.111 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:660 - train/loss:0.139 - train/lm_loss:0.139 - train/ppl:1.149 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:661 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.112 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:662 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:663 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:664 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:665 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:705.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:666 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:667 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:668 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:669 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:670 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:671 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:672 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.112 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:673 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:674 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:675 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:676 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:677 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:678 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:679 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:680 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:635.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:681 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.092
+step:682 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:683 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:684 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.110 - train/num_active_tokens:708.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:685 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:686 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:689.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:687 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:688 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.097 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:689 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:690 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:691 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.138 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:692 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:693 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:694 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:695 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:696 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:697 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:698 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:699 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.110 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:700 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:701 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.124 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:702 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:703 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:704 - train/loss:0.089 - train/lm_loss:0.089 - train/ppl:1.093 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:705 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:706 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:707 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.091
+step:708 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.111 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:709 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:710 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.135 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:711 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:712 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:713 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:714 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:715 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:716 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:717 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:718 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:719 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:720 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:721 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:722 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:723 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:724 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.134 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:725 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:726 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.126 - train/num_active_tokens:681.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:727 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:728 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:729 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.125 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:730 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:731 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:631.000 - train/num_samples:64.000 - train/lr(1e-3):0.090
+step:732 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.099 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:733 - train/loss:0.089 - train/lm_loss:0.089 - train/ppl:1.093 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:734 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:735 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:736 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:737 - train/loss:0.086 - train/lm_loss:0.086 - train/ppl:1.090 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:738 - train/loss:0.144 - train/lm_loss:0.144 - train/ppl:1.155 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:739 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:740 - train/loss:0.084 - train/lm_loss:0.084 - train/ppl:1.088 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:741 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:742 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.134 - train/num_active_tokens:629.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:743 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:625.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:744 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.128 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:745 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:746 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:747 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:748 - train/loss:0.126 - train/lm_loss:0.126 - train/ppl:1.135 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:749 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:750 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:751 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:752 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:753 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:754 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:689.000 - train/num_samples:64.000 - train/lr(1e-3):0.089
+step:755 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:756 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.101 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:757 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:758 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:759 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:760 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:761 - train/loss:0.133 - train/lm_loss:0.133 - train/ppl:1.142 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:762 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:763 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.125 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:764 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:765 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.129 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:766 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:767 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.107 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:768 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:769 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:770 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:771 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:772 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:773 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:774 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:775 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:776 - train/loss:0.131 - train/lm_loss:0.131 - train/ppl:1.140 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.088
+step:777 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.109 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:778 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:779 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:780 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:781 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.131 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:782 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:783 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.126 - train/num_active_tokens:705.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:784 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:785 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:786 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:787 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:788 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:789 - train/loss:0.074 - train/lm_loss:0.074 - train/ppl:1.076 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:790 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:676.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:791 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:703.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:792 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:793 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:639.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:794 - train/loss:0.130 - train/lm_loss:0.130 - train/ppl:1.138 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:795 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:796 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:797 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:798 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:695.000 - train/num_samples:64.000 - train/lr(1e-3):0.087
+step:799 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:800 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.107 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:801 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:802 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:803 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:804 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:805 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:704.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:806 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:807 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:808 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:809 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:810 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.100 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:811 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:812 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:813 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:814 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:815 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:816 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:817 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.122 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:818 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:819 - train/loss:0.118 - train/lm_loss:0.118 - train/ppl:1.125 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.086
+step:820 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:821 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:822 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.098 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:823 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:824 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.127 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:825 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:826 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:827 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.094 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:828 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:829 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:830 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:831 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:701.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:832 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:833 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:834 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:835 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:836 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:837 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:838 - train/loss:0.132 - train/lm_loss:0.132 - train/ppl:1.141 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:839 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.085
+step:840 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.099 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:841 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.136 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:842 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:843 - train/loss:0.084 - train/lm_loss:0.084 - train/ppl:1.088 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:844 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:845 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:846 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.127 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:847 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:848 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.127 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:849 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:850 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:851 - train/loss:0.070 - train/lm_loss:0.070 - train/ppl:1.073 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:852 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.099 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:853 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:854 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:855 - train/loss:0.081 - train/lm_loss:0.081 - train/ppl:1.084 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:856 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:857 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:858 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:859 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.099 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.084
+step:860 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:861 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:862 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:863 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:624.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:864 - train/loss:0.119 - train/lm_loss:0.119 - train/ppl:1.127 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:865 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.119 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:866 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:867 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:868 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.099 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:869 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:870 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:627.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:871 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:677.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:872 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:873 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:874 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:875 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:876 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:877 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:878 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.083
+step:879 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:880 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:881 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:709.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:882 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.094 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:883 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:700.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:884 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:885 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:686.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:886 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.108 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:887 - train/loss:0.082 - train/lm_loss:0.082 - train/ppl:1.085 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:888 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.095 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:889 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:890 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:891 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:673.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:892 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:893 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:894 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.109 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:895 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.121 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:896 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:897 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.082
+step:898 - train/loss:0.087 - train/lm_loss:0.087 - train/ppl:1.091 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:899 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:630.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:900 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:901 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:902 - train/loss:0.116 - train/lm_loss:0.116 - train/ppl:1.123 - train/num_active_tokens:710.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:903 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:904 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:905 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:906 - train/loss:0.080 - train/lm_loss:0.080 - train/ppl:1.083 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:907 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:908 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:909 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:633.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:910 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:911 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:912 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.118 - train/num_active_tokens:633.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:913 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:914 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:915 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.081
+step:916 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:917 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:697.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:918 - train/loss:0.128 - train/lm_loss:0.128 - train/ppl:1.137 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:919 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.099 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:920 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:921 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:922 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.116 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:923 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:924 - train/loss:0.134 - train/lm_loss:0.134 - train/ppl:1.143 - train/num_active_tokens:680.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:925 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:926 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:927 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:928 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:929 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:930 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:931 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:932 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:933 - train/loss:0.120 - train/lm_loss:0.120 - train/ppl:1.128 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:934 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.080
+step:935 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.116 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:936 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.096 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:937 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:645.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:938 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.129 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:939 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:940 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:941 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.101 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:942 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:943 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:944 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.121 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:945 - train/loss:0.140 - train/lm_loss:0.140 - train/ppl:1.151 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:946 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.105 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:947 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:948 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:949 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:950 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:951 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:704.000 - train/num_samples:64.000 - train/lr(1e-3):0.079
+step:952 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.117 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:953 - train/loss:0.081 - train/lm_loss:0.081 - train/ppl:1.085 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:954 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:955 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:956 - train/loss:0.124 - train/lm_loss:0.124 - train/ppl:1.132 - train/num_active_tokens:754.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:957 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:958 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:715.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:959 - train/loss:0.122 - train/lm_loss:0.122 - train/ppl:1.130 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:960 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:961 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.099 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:962 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:963 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:661.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:964 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:635.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:965 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:688.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:966 - train/loss:0.085 - train/lm_loss:0.085 - train/ppl:1.089 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:967 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:968 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:684.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:969 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.111 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.078
+step:970 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:971 - train/loss:0.084 - train/lm_loss:0.084 - train/ppl:1.087 - train/num_active_tokens:654.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:972 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.101 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:973 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:974 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:975 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:976 - train/loss:0.109 - train/lm_loss:0.109 - train/ppl:1.115 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:977 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:690.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:978 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.120 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:979 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:707.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:980 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.096 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:981 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:982 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.099 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:983 - train/loss:0.123 - train/lm_loss:0.123 - train/ppl:1.131 - train/num_active_tokens:713.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:984 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:985 - train/loss:0.129 - train/lm_loss:0.129 - train/ppl:1.138 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:986 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:699.000 - train/num_samples:64.000 - train/lr(1e-3):0.077
+step:987 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.100 - train/num_active_tokens:651.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:988 - train/loss:0.114 - train/lm_loss:0.114 - train/ppl:1.121 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:989 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:695.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:990 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:991 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:992 - train/loss:0.082 - train/lm_loss:0.082 - train/ppl:1.085 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:993 - train/loss:0.110 - train/lm_loss:0.110 - train/ppl:1.116 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:994 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.112 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:995 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:996 - train/loss:0.085 - train/lm_loss:0.085 - train/ppl:1.088 - train/num_active_tokens:691.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:997 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:998 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:999 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.110 - train/num_active_tokens:665.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:1000 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:716.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:1001 - train/loss:0.087 - train/lm_loss:0.087 - train/ppl:1.091 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:1002 - train/loss:0.074 - train/lm_loss:0.074 - train/ppl:1.076 - train/num_active_tokens:642.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:1003 - train/loss:0.125 - train/lm_loss:0.125 - train/ppl:1.133 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.076
+step:1004 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1005 - train/loss:0.121 - train/lm_loss:0.121 - train/ppl:1.128 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1006 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:694.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1007 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1008 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1009 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:638.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1010 - train/loss:0.115 - train/lm_loss:0.115 - train/ppl:1.122 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1011 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:652.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1012 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:629.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1013 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:655.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1014 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1015 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:678.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1016 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.100 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1017 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1018 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.096 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1019 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.109 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1020 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:663.000 - train/num_samples:64.000 - train/lr(1e-3):0.075
+step:1021 - train/loss:0.112 - train/lm_loss:0.112 - train/ppl:1.118 - train/num_active_tokens:636.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1022 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1023 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.101 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1024 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:705.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1025 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1026 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.099 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1027 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.112 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1028 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1029 - train/loss:0.113 - train/lm_loss:0.113 - train/ppl:1.119 - train/num_active_tokens:659.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1030 - train/loss:0.085 - train/lm_loss:0.085 - train/ppl:1.088 - train/num_active_tokens:695.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1031 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1032 - train/loss:0.106 - train/lm_loss:0.106 - train/ppl:1.111 - train/num_active_tokens:643.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1033 - train/loss:0.076 - train/lm_loss:0.076 - train/ppl:1.078 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1034 - train/loss:0.082 - train/lm_loss:0.082 - train/ppl:1.086 - train/num_active_tokens:637.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1035 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1036 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.074
+step:1037 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1038 - train/loss:0.080 - train/lm_loss:0.080 - train/ppl:1.083 - train/num_active_tokens:683.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1039 - train/loss:0.084 - train/lm_loss:0.084 - train/ppl:1.087 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1040 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1041 - train/loss:0.084 - train/lm_loss:0.084 - train/ppl:1.087 - train/num_active_tokens:667.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1042 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.094 - train/num_active_tokens:689.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1043 - train/loss:0.097 - train/lm_loss:0.097 - train/ppl:1.102 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1044 - train/loss:0.102 - train/lm_loss:0.102 - train/ppl:1.107 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1045 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.100 - train/num_active_tokens:629.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1046 - train/loss:0.093 - train/lm_loss:0.093 - train/ppl:1.097 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1047 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:698.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1048 - train/loss:0.086 - train/lm_loss:0.086 - train/ppl:1.089 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1049 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.112 - train/num_active_tokens:634.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1050 - train/loss:0.108 - train/lm_loss:0.108 - train/ppl:1.114 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1051 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:696.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1052 - train/loss:0.117 - train/lm_loss:0.117 - train/ppl:1.124 - train/num_active_tokens:670.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1053 - train/loss:0.101 - train/lm_loss:0.101 - train/ppl:1.106 - train/num_active_tokens:657.000 - train/num_samples:64.000 - train/lr(1e-3):0.073
+step:1054 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1055 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1056 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1057 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.110 - train/num_active_tokens:689.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1058 - train/loss:0.098 - train/lm_loss:0.098 - train/ppl:1.103 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1059 - train/loss:0.100 - train/lm_loss:0.100 - train/ppl:1.105 - train/num_active_tokens:671.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1060 - train/loss:0.075 - train/lm_loss:0.075 - train/ppl:1.078 - train/num_active_tokens:660.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1061 - train/loss:0.107 - train/lm_loss:0.107 - train/ppl:1.113 - train/num_active_tokens:653.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1062 - train/loss:0.087 - train/lm_loss:0.087 - train/ppl:1.091 - train/num_active_tokens:640.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1063 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.094 - train/num_active_tokens:682.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1064 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:674.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1065 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.094 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1066 - train/loss:0.086 - train/lm_loss:0.086 - train/ppl:1.089 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1067 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:692.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1068 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.096 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1069 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.072
+step:1070 - train/loss:0.087 - train/lm_loss:0.087 - train/ppl:1.091 - train/num_active_tokens:721.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1071 - train/loss:0.086 - train/lm_loss:0.086 - train/ppl:1.090 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1072 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:672.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1073 - train/loss:0.091 - train/lm_loss:0.091 - train/ppl:1.095 - train/num_active_tokens:669.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1074 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.099 - train/num_active_tokens:646.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1075 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:695.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1076 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.100 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1077 - train/loss:0.071 - train/lm_loss:0.071 - train/ppl:1.074 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1078 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:687.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1079 - train/loss:0.076 - train/lm_loss:0.076 - train/ppl:1.079 - train/num_active_tokens:664.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1080 - train/loss:0.089 - train/lm_loss:0.089 - train/ppl:1.093 - train/num_active_tokens:648.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1081 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:662.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1082 - train/loss:0.092 - train/lm_loss:0.092 - train/ppl:1.097 - train/num_active_tokens:656.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1083 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:658.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1084 - train/loss:0.099 - train/lm_loss:0.099 - train/ppl:1.104 - train/num_active_tokens:647.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1085 - train/loss:0.087 - train/lm_loss:0.087 - train/ppl:1.091 - train/num_active_tokens:693.000 - train/num_samples:64.000 - train/lr(1e-3):0.071
+step:1086 - train/loss:0.105 - train/lm_loss:0.105 - train/ppl:1.110 - train/num_active_tokens:702.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1087 - train/loss:0.111 - train/lm_loss:0.111 - train/ppl:1.117 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1088 - train/loss:0.085 - train/lm_loss:0.085 - train/ppl:1.088 - train/num_active_tokens:644.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1089 - train/loss:0.094 - train/lm_loss:0.094 - train/ppl:1.098 - train/num_active_tokens:679.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1090 - train/loss:0.074 - train/lm_loss:0.074 - train/ppl:1.077 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1091 - train/loss:0.080 - train/lm_loss:0.080 - train/ppl:1.083 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1092 - train/loss:0.095 - train/lm_loss:0.095 - train/ppl:1.100 - train/num_active_tokens:633.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1093 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.109 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1094 - train/loss:0.090 - train/lm_loss:0.090 - train/ppl:1.094 - train/num_active_tokens:649.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1095 - train/loss:0.103 - train/lm_loss:0.103 - train/ppl:1.108 - train/num_active_tokens:668.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1096 - train/loss:0.083 - train/lm_loss:0.083 - train/ppl:1.087 - train/num_active_tokens:666.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1097 - train/loss:0.096 - train/lm_loss:0.096 - train/ppl:1.101 - train/num_active_tokens:675.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1098 - train/loss:0.104 - train/lm_loss:0.104 - train/ppl:1.110 - train/num_active_tokens:650.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+step:1099 - train/loss:0.088 - train/lm_loss:0.088 - train/ppl:1.092 - train/num_active_tokens:641.000 - train/num_samples:64.000 - train/lr(1e-3):0.070
+W0501 08:58:05.665000 3521375 site-packages/torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 3521550 closing signal SIGTERM
+E0501 08:58:05.783000 3521375 site-packages/torch/distributed/elastic/multiprocessing/api.py:984] failed (exitcode: -15) local_rank: 0 (pid: 3521549) of binary: /home/qiaohezhe/anaconda3/bin/python3.13
+Traceback (most recent call last):
+  File "/home/qiaohezhe/anaconda3/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+  File "/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/run.py", line 991, in main
+    run(args)
+    ~~~^^^^^^
+  File "/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/run.py", line 982, in run
+    elastic_launch(
+    ~~~~~~~~~~~~~~~
+        config=config,
+        ~~~~~~~~~~~~~~
+        entrypoint=cmd,
+        ~~~~~~~~~~~~~~~
+    )(*cmd_args)
+    ~^^^^^^^^^^^
+  File "/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/home/qiaohezhe/anaconda3/lib/python3.13/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+    ...<2 lines>...
+    )
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+verl.trainer.fsdp_direct_full_json_generation_sft_trainer FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-05-01_08:58:05
+  host      : pgs-104-177
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 3521550)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 3521550
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-05-01_08:58:05
+  host      : pgs-104-177
+  rank      : 0 (local_rank: 0)
+  exitcode  : -15 (pid: 3521549)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 3521549
+============================================================
