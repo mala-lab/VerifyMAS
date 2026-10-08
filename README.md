@@ -27,8 +27,17 @@ We propose **VerifyMAS**, a **hypothesis verification framework** for agent fail
 
 ## Repository Structure
 
-The code will be uploaded soon. 
+# VerifyMAS Repository Structure
 
+The `main` branch is organized around data, SFT data preparation, baseline inference, and zero-shot evaluation. VerifyMAS verifies failure hypotheses against full multi-agent trajectories to identify errors and responsible agents.
+
+| Directory or file | Contents and purpose |
+|---|---|
+| [`baselines/`](https://github.com/mala-lab/VerifyMAS/tree/main/baselines) | Baseline inference scripts, including CoT and error-first variants, plus `prompt.txt` and `prompt_cot.txt` |
+| [`data/`](https://github.com/mala-lab/VerifyMAS/tree/main/data) | Two JSONL files: `test_aegis.jsonl` and `whowhen.jsonl` |
+| [`sft_data_construction/`](https://github.com/mala-lab/VerifyMAS/tree/main/sft_data_construction) | Scripts for converting multi-agent JSONL data, including one that handles rare agents |
+| [`training_data/`](https://github.com/mala-lab/VerifyMAS/tree/main/training_data) | Currently contains only an empty `readme` placeholder |
+| [`zero_shot/`](https://github.com/mala-lab/VerifyMAS/tree/main/zero_shot) | Inference and evaluation scripts for standard evaluation, SFT-model evaluation, and OpenAI API inference |
 
 
 
