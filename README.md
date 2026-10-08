@@ -34,7 +34,7 @@ The `main` branch is organized around data, SFT data preparation, baseline infer
 | [`baselines/`](https://github.com/mala-lab/VerifyMAS/tree/main/baselines) | Baseline inference scripts, including CoT and error-first variants, plus `prompt.txt` and `prompt_cot.txt` |
 | [`data/`](https://github.com/mala-lab/VerifyMAS/tree/main/data) | Two JSONL files of test datasets: `test_aegis.jsonl` and `whowhen.jsonl` |
 | [`sft_data_construction/`](https://github.com/mala-lab/VerifyMAS/tree/main/sft_data_construction) | Scripts for converting multi-agent JSONL data, including one that handles rare agents |
-| [`training_data/`](https://github.com/mala-lab/VerifyMAS/tree/main/training_data) |The training datasets for SFT |
+| [`training_data/`](https://github.com/mala-lab/VerifyMAS/tree/main/training_data) |The training datasets and log for SFT |
 | [`zero_shot/`](https://github.com/mala-lab/VerifyMAS/tree/main/zero_shot) | Inference and evaluation scripts for standard evaluation, SFT-model evaluation, and OpenAI API inference |
 
 The processed training data for **VerifyMAS** can be downloaded from [this Google Drive folder](https://drive.google.com/drive/folders/1iY-BNHaz4GrvhPUf-nMscxlLMIw5nIeG?usp=sharing).
