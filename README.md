@@ -27,8 +27,6 @@ We propose **VerifyMAS**, a **hypothesis verification framework** for agent fail
 
 ## Repository Structure
 
-# VerifyMAS Repository Structure
-
 The `main` branch is organized around data, SFT data preparation, baseline inference, and zero-shot evaluation. VerifyMAS verifies failure hypotheses against full multi-agent trajectories to identify errors and responsible agents.
 
 | Directory or file | Contents and purpose |
