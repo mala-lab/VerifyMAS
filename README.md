@@ -38,7 +38,7 @@ The `main` branch is organized around data, SFT data preparation, baseline infer
 | [`training_data/`](https://github.com/mala-lab/VerifyMAS/tree/main/training_data) |The training datasets and log for SFT |
 | [`zero_shot/`](https://github.com/mala-lab/VerifyMAS/tree/main/zero_shot) | Inference and evaluation scripts for standard evaluation, SFT-model evaluation, and OpenAI API inference |
 
-The processed training data for **VerifyMAS** can be downloaded from [this Google Drive folder](https://drive.google.com/drive/folders/1iY-BNHaz4GrvhPUf-nMscxlLMIw5nIeG?usp=sharing).
+The processed training data for **VerifyMAS** can be downloaded from [this Google Drive folder](https://drive.google.com/drive/folders/1iY-BNHaz4GrvhPUf-nMscxlLMIw5nIeG?usp=sharing) or [Hugging face](https://huggingface.co/datasets/hezheqiao/VerifyMAS-SFT). The model can be downloaed from  [Hugging face](https://huggingface.co/hezheqiao/VerifyMAS-7B).
 
 ## 📖 Citation
     
