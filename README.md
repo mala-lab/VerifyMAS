@@ -6,8 +6,8 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2605.08715-b31b1b)](https://arxiv.org/abs/2605.17467)
 [![Project Page](https://img.shields.io/badge/Project_Page-website-blue)](https://hezheqiao2022.github.io/VerifyMAS/)
-[![Dataset](https://img.shields.io/badge/🤗_Dataset-VerifyMAS-yellow)]()
-[![Model](https://img.shields.io/badge/🤗_Dataset-VerifyMAS-yellow)](https://huggingface.co/hezheqiao/VerifyMAS-7B/tree/main)
+[![Dataset](https://img.shields.io/badge/🤗_Dataset-VerifyMAS-yellow)](https://huggingface.co/datasets/hezheqiao/VerifyMAS-SFT)
+[![Model](https://img.shields.io/badge/🤗_Model-VerifyMAS-blue)](https://huggingface.co/hezheqiao/VerifyMAS-7B)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 </div>
